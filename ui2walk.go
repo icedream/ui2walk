@@ -22,6 +22,7 @@ import (
 
 var forceUpdate *bool = flag.Bool("force", false, "forces code generation for up-to-date files")
 var translatable *bool = flag.Bool("tr", false, "adds calls to a user provided 'func tr(source string, context ...string) string' that returns a translation of the source argument, using provided context args for disambiguation")
+var packageName *string = flag.String("pkg", "main", "defines the package name for which to generate the code")
 
 type String struct {
 	Text         string `xml:"string"`
@@ -891,19 +892,19 @@ func writeActionInitializations(buf *bytes.Buffer, actions []*Action) error {
 
 func generateUICode(buf *bytes.Buffer, ui *UI) error {
 	// Comment, package decl, imports
-	buf.WriteString(
+	buf.WriteString(fmt.Sprintf(
 		`// This file was created by ui2walk and may be regenerated.
 		// DO NOT EDIT OR YOUR MODIFICATIONS WILL BE LOST!
-		
+
 		//+build windows
 
-		package main
-		
+		package %s
+
 		import (
 			"github.com/lxn/walk"
 		)
-		
-		`)
+
+		`, *packageName))
 
 	// Embed the corresponding Walk type.
 	var embeddedType string
